@@ -33,7 +33,3 @@ plt.show()
 # plt.ylabel('True Positive Rate')
 # plt.xlabel('False Positive Rate')
 # plt.show()
-
-
-
-plt.show()
