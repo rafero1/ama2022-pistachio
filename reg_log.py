@@ -1,61 +1,39 @@
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-from sklearn import metrics
 import seaborn as sn
 import matplotlib.pyplot as plt
 
+
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn import metrics
+#from sklearn.metrics import accuracy_score,classification_report, confusion_matrix, plot_confusion_matrix, roc_curve, auc, roc_auc_score
 
 data = pd.read_excel('ama2022-pistachio\Pistachio_16_Features_Dataset\Pistachio_16_Features_Dataset.xls')
 
 X = data.drop('Class', axis=1)
 y = data['Class']
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 
-def metrics(y, y_pred):
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=0)
 
-    y = y.astype('bool')
-    y_pred = y_pred.astype('bool')
+log_reg = LogisticRegression()
+log_reg.fit(X_train, y_train)
+y_pred = log_reg.predict(X_test)
 
-    TP = sum(y & y_pred) 
-    TN = sum(~y & ~y_pred)
-    FP = sum(~y & y_pred)
-    FN = sum(y & ~y_pred)
+print(metrics.classification_report(y, log_reg.predict(X)))
 
-    precision = TP / (TP + FP)
-    accuracy = (TP + TN)/(TP + FP + TN + FN)
-    recall = TP /(TP+FN)
-    f1 = 2*(precision * recall)/(precision + recall)
-    cm = np.array([[ TP, TN ], [ FP, FN ]])
+metrics.plot_confusion_matrix(log_reg, X_test, y_test)  
+plt.show()
 
-    if np.isnan(precision):
-        precision = 0
-    if np.isnan(accuracy):
-        accuracy = 0
-    if np.isnan(recall):
-        recall = 0
-    if np.isnan(f1):
-        f1 = 0
+#y_pred_proba = log_reg.predict_proba(X_test)[::,1]
+# fpr, tpr, _ = metrics.roc_curve(y_test,  y_pred_proba)
 
-    return precision, accuracy, recall, f1, cm
-def confusion_matrix(cm):
-    ax = sns.heatmap(cm, annot=True, cmap='Blues')
+# #create ROC curve
+# plt.plot(fpr,tpr)
+# plt.ylabel('True Positive Rate')
+# plt.xlabel('False Positive Rate')
+# plt.show()
 
-    ax.set_title('Confusion Matrix\n\n');
-    ax.set_xlabel('\nPredicted Values')
-    ax.set_ylabel('Actual Values ');
 
-    ## Ticket labels - List must be in alphabetical order
-    ax.xaxis.set_ticklabels(['False','True'])
-    ax.yaxis.set_ticklabels(['False','True'])
 
-    ## Display the visualization of the Confusion Matrix.
-    plt.show()
-
-logreg = LogisticRegression()
-
-logreg.fit(X_train, y_train)
-y_pred = logreg.predict(X_test)
-
-precision, accuracy, recall, f1, cm = metrics(y, y_pred)
+plt.show()
