@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn import metrics
-#from sklearn.metrics import accuracy_score,classification_report, confusion_matrix, plot_confusion_matrix, roc_curve, auc, roc_auc_score
+from sklearn.metrics import accuracy_score,classification_report, confusion_matrix, plot_confusion_matrix, roc_curve, auc, roc_auc_score
 
 data = pd.read_excel('ama2022-pistachio\Pistachio_16_Features_Dataset\Pistachio_16_Features_Dataset.xls')
 
@@ -22,14 +22,12 @@ y_pred = log_reg.predict(X_test)
 
 print(metrics.classification_report(y, log_reg.predict(X)))
 
-metrics.plot_confusion_matrix(log_reg, X_test, y_test)  
-plt.show()
+pred_prob1 = log_reg.predict_proba(X_test)
+fpr1, tpr1, thresh1 = metrics.roc_curve(y_test, pred_prob1[:,1], pos_label=1)
+random_probs = [0 for i in range(len(y_test))]
+p_fpr, p_tpr, _ = metrics.roc_curve(y_test, random_probs, pos_label=1)
+auc_score1 = metrics.roc_auc_score(y_test, pred_prob1[:,1])
 
-#y_pred_proba = log_reg.predict_proba(X_test)[::,1]
-# fpr, tpr, _ = metrics.roc_curve(y_test,  y_pred_proba)
+print(auc_score1)
 
-# #create ROC curve
-# plt.plot(fpr,tpr)
-# plt.ylabel('True Positive Rate')
-# plt.xlabel('False Positive Rate')
-# plt.show()
+#metrics.ConfusionMatrixDisplay.from_estimator(log_reg, X_test, y_test)
